@@ -2,13 +2,15 @@
 #include <stdlib.h>
 #include <time.h>
 
+int tri;		//get number by ___ 함수들에 공통으로 사용되어야 하므로 전역변수를 쓴다.
+ 
 /* run this program using the console pauser or add your own getch, system("pause") or input loop */
 	
 void initiate_bingo(int n, int table1[n][n], int table2[n][n]);	//빙고 테이블을 처음에 만들어줌 
 void print_bingo(int n, int table1[n][n], int table2[n][n]);	//빙고 테이블 현재 상황을 화면에 출력
-void get_number_byMe(int *i, int n, int choice1[n*n], int choice2[n*n]);			
+void get_number_byMe(int tri, int n, int choice1[n*n], int choice2[n*n]);			
 											//내가 빙고 번호 입력 선택
-void get_number_byCom(int *i, int n, int choice1[n*n], int choice2[n*n]);
+void get_number_byCom(int tri, int n, int choice1[n*n], int choice2[n*n]);
 											//컴퓨터가 임의로 빙고 번호 선택
 void process_bingo();						//선택된 숫자를 입력받아서 빙고 테이블 칸을 채움
 void count_bingo();							//빙고 테이블이 채운 가로/세로/대각선 줄 수를 계산하여 반환 
@@ -21,7 +23,6 @@ int main(int argc, char *argv[]) {
 	int com_table[N][N];	//컴퓨터의 N*N 크기의 빙고 테이블 
 	int userchoice[N*N];	//사용자가 선택한 숫자를 저장하는 배열 
 	int comchoice[N*N]; 	//컴퓨터가 선택한 숫자를 저장하는 배열 
-	int tri=0;				//숫자 선택한 횟수 저장 변수 (몇번째 turn 인지)
 	int turn;				//몇번째 turn 에서 승부가 났는지 출력하기 위함 
 	
 	turn = tri+1;
@@ -32,10 +33,13 @@ int main(int argc, char *argv[]) {
 	
 	print_bingo(N, user_table, com_table); 
 	
-	//tri = 0 
-	get_number_byMe(&tri, N, userchoice, comchoice); //0에 할당 후 tri = 1 
-	tri--;											//tri = 0
-	get_number_byCom(&tri, N, userchoice, comchoice); //0에 할당 후 tri = 1
+	for(tri=0; tri<N*N; tri++){
+	
+		get_number_byMe(tri, N, userchoice, comchoice); 
+
+		get_number_byCom(tri, N, userchoice, comchoice); 
+		
+	}
 	
 	//}while(tri>25||빙고 M줄 완성); 
 	
@@ -117,56 +121,57 @@ void print_bingo(int n, int table1[n][n], int table2[n][n])
 	
 }
 
-void get_number_byMe(int *i, int n, int choice1[n*n], int choice2[n*n])	//** *i 대신 *tri? 
+void get_number_byMe(int tri, int n, int choice1[n*n], int choice2[n*n])
 {
-	//int *i; 						**함수 밖에서도 i값이 유지되어야 하기 때문에 포인터 필요?
 	int j;
 	
-	for(; *i<n*n; *i++){
 	
+	printf("숫자를 선택하시오. : ");
+	scanf("%d", &choice1[tri]);		//tri번째 사용자 선택 
 	
-		printf("숫자를 선택하시오. : ");
-		scanf("%d", &choice1[*i]);		//i번째 사용자 선택 
+	do{
 	
-		if(choice1[*i]<1||choice1[*i]>25){
-			printf("범위 내의 값을 입력하시오. : ");  
-			scanf("%d", &choice1[*i]);	//잘못된 선택이므로 i번째 선택을 다시 할당시킴 
+		if(choice1[tri]<1||choice1[tri]>25){
+			printf("범위 내의 값이 아닙니다. 1과 %d 사이의 값을 입력하시오. : ", n*n);
+			scanf("%d", &choice1[tri]);	//잘못된 선택이므로 tri번째 선택을 다시 할당시킴 
 		}
 		
-		for(j=0; j<*i; j++){					//i(현재 선택 횟수)보다 이전에의 선택과 비교하기 위함 
-			if(choice1[*i]==choice1[j]||	//사용자가 이미 선택한 수 제외하기 위함 
-				choice1[*i]==choice2[j]){	//컴퓨터가 이미 선택한 수 제외하기 위함 
+		for(j=0; j<tri; j++){				//현재 선택보다 이전에의 선택과 비교하기 위함 
+			if(choice1[tri]==choice1[j]||	//사용자가 이미 선택한 수 제외하기 위함 
+				choice1[tri]==choice2[j]){	//컴퓨터가 이미 선택한 수 제외하기 위함 
 												
 				printf("이미 선택된 값 입니다. 다시 입력하시오. : ");
-				scanf("%d", &choice1[*i]);	//잘못된 선택이므로 i번째 선택을 다시 할당  
+				scanf("%d", &choice1[tri]);	//잘못된 선택이므로 tri번째 선택을 다시 할당  
 			}
 		}
-	}
+	}while(choice1[tri]<1||choice1[tri]>25||
+			choice1[tri]==choice1[j]||choice1[tri]==choice2[j]);	//한번 반복 후 여전히 잘못된 선택이
+																	//가능하기 때문에 do-while문 사용 
+	
 }
 
-void get_number_byCom(int *i, int n, int choice1[n*n], int choice2[n*n])
+void get_number_byCom(int tri, int n, int choice1[n*n], int choice2[n*n])
 {
 	int j;
 	int max;
 	max = n*n; 
-	
-	for(; *i<max; *i++){
+
 	
 		printf("컴퓨터가 선택한 숫자 입니다. : ");
 		
 		srand((unsigned)time(NULL));
-		choice2[*i] = rand()%max+1;		//1부터 n*n+1 사이의 수 랜덤하게 발생 
+		choice2[tri] = rand()%max+1;		//1부터 n*n+1 사이의 수 랜덤하게 발생 
 		
 		
-		for(j=0; j<*i; j++){					//i(현재 선택 횟수)보다 이전에의 선택과 비교하기 위함 
-			if(choice2[*i]==choice1[j]||	//사용자가 이미 선택한 수 제외
-				choice2[*i]==choice2[j]){	//컴퓨터가 이미 선택한 수 제외 
+		for(j=0; j<tri; j++){				//현재 선택보다 이전에의 선택과 비교하기 위함 
+			if(choice2[tri]==choice1[j]||	//사용자가 이미 선택한 수 제외
+				choice2[tri]==choice2[j]){	//컴퓨터가 이미 선택한 수 제외 
 				
-				choice2[*i] = rand()%max+1;	//다시 랜덤하게 선택 
+				choice2[tri] = rand()%max+1;	//다시 랜덤하게 선택 
 				
 			}
 		}
 		
-		printf("%d\n", &choice2[*i]);	//잘못된 선택이므로 i번째 선택을 다시 할당
-	}
+		printf("%d\n", &choice2[tri]);	//잘못된 선택을 삭제하고 tri번째 선택을 재할당
+
 }
