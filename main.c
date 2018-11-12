@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
 	
 	for(tri=0; tri<N*N; tri++){
 	
-		get_number_byMe(tri, N, userchoice, comchoice); 
+		get_number_byMe(tri, N, userchoice, comchoice); //***여기서 멈춤 
 
 		get_number_byCom(tri, N, userchoice, comchoice); 
 		
@@ -62,42 +62,64 @@ int main(int argc, char *argv[]) {
 void initiate_bingo(int n, int table1[n][n], int table2[n][n])	//***좀 더 간단한거 생각 ****
 {
 	int i, j;
-	int k, l;
 	int max;
+	int value1[n*n];		//일차원 배열으로 value1 선언  
+	int value2[n*n]; 
+	int a, b;
 	max = n*n;
 	
 	srand((unsigned)time(NULL));
 	
-	for(i=0; i<n; i++){
-		for(j=0; j<n; j++){	 
-			table1[i][j] = rand()%max+1;		//이차원 배열에 1~max까지의 값 할당
-			
-			for(k=0; k<i; k++){
-				for(l=0; l<j; l++){
-					if(table1[i][j]==table1[k][l])
-						i--;
-						j--;			// 이전 값과 중복되는 값이면 table[i][j]의 값 다시 할당 
-						continue;		// continue 를 이용하여 다시 반복한다. 
-				}
-			} 
+	value1[0] = rand()%max+1;			//value[0] 은 겹칠 수 없으므로 난수함수의 값으로 바로 할당 
+	
+	for(a=1; a<max; a++){
+	
+		value1[a] = rand()%max+1;		//이차원 배열에 1~max까지의 값 할당
+
+		for(b=0; b<a; b++){
+			while(value1[a]==value1[b]){	//a 번째 값이 이전의 값과 같으면 
+				value1[a] = rand()%max+1;	//재할당  ****또 겹칠 수 있음 
+				b = 0;				// 이 문장이 없으면 b는 계속해서 커져서 이전의 값과 겹칠 수 있음  
+			}
 		}
 	}
 	
+	a = 0;							//a=0으로 초기화 
+	
 	for(i=0; i<n; i++){
-		for(j=0; j<n; j++){	 
-			table2[i][j] = rand()%max+1;		//이차원 배열에 1~max까지의 값 할당
+		for(j=0; j<n; j++){
+			table1[i][j] = value1[a];	//각 테이블 값에 위에서 구한 반복되지 않은 value를 대응시킴 
+			a++;						//a의 값을 하나씩 늘리면서 반복 
 			
-			for(k=0; k<i; k++){
-				for(l=0; l<j; l++){
-					if(table2[i][j]==table2[k][l])
-						i--;
-						j--;			// 이전 값과 중복되는 값이면 table[i][j]의 값 다시 할당 
-						continue;		// continue 를 이용하여 다시 반복한다. 
-				}
-			} 
 		}
 	}
+
+	value2[0] = rand()%max+1;			//value[0] 은 겹칠 수 없으므로 난수함수의 값으로 바로 할당 
+	
+	for(a=1; a<max; a++){
+	
+		value2[a] = rand()%max+1;		//이차원 배열에 1~max까지의 값 할당
+
+		for(b=0; b<a; b++){
+			while(value2[a]==value2[b]){	//a 번째 값이 이전의 값과 같으면 
+				value2[a] = rand()%max+1;	//재할당  ****또 겹칠 수 있음 
+				b = 0;				// 이 문장이 없으면 b는 계속해서 커져서 이전의 값과 겹칠 수 있음  
+			}
+		}
+	}
+	
+	a = 0;							//a=0으로 초기화 
+	
+	for(i=0; i<n; i++){
+		for(j=0; j<n; j++){
+			table2[i][j] = value2[a];	//각 테이블 값에 위에서 구한 반복되지 않은 value를 대응시킴 
+			a++;						//a의 값을 하나씩 늘리면서 반복 
+			
+		}
+	}
+	
 }
+
 
 void print_bingo(int n, int table1[n][n], int table2[n][n])
 {
@@ -131,11 +153,14 @@ void get_number_byMe(int tri, int n, int choice1[n*n], int choice2[n*n])
 	
 	do{
 	
-		if(choice1[tri]<1||choice1[tri]>25){
+		if(choice1[tri]<1||choice1[tri]>n*n){
 			printf("범위 내의 값이 아닙니다. 1과 %d 사이의 값을 입력하시오. : ", n*n);
 			scanf("%d", &choice1[tri]);	//잘못된 선택이므로 tri번째 선택을 다시 할당시킴 
 		}
-		
+	}while(choice1[tri]<1||choice1[tri]>n*n);
+	
+	do{
+			
 		for(j=0; j<tri; j++){				//현재 선택보다 이전에의 선택과 비교하기 위함 
 			if(choice1[tri]==choice1[j]||	//사용자가 이미 선택한 수 제외하기 위함 
 				choice1[tri]==choice2[j]){	//컴퓨터가 이미 선택한 수 제외하기 위함 
@@ -144,8 +169,7 @@ void get_number_byMe(int tri, int n, int choice1[n*n], int choice2[n*n])
 				scanf("%d", &choice1[tri]);	//잘못된 선택이므로 tri번째 선택을 다시 할당  
 			}
 		}
-	}while(choice1[tri]<1||choice1[tri]>25||
-			choice1[tri]==choice1[j]||choice1[tri]==choice2[j]);	//한번 반복 후 여전히 잘못된 선택이
+	}while(choice1[tri]==choice1[j]||choice1[tri]==choice2[j]);	//한번 반복 후 여전히 잘못된 선택이
 																	//가능하기 때문에 do-while문 사용 
 	
 }
