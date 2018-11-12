@@ -12,7 +12,9 @@ void get_number_byMe(int tri, int n, int choice1[n*n], int choice2[n*n]);
 											//내가 빙고 번호 입력 선택
 void get_number_byCom(int tri, int n, int choice1[n*n], int choice2[n*n]);
 											//컴퓨터가 임의로 빙고 번호 선택
-void process_bingo();						//선택된 숫자를 입력받아서 빙고 테이블 칸을 채움
+void process_bingo(int n, int tri, int table1[n][n], int table2[n][n], 
+					int choice1[tri], int choice2[tri]);
+											//선택된 숫자를 입력받아서 빙고 테이블 칸을 채움
 void count_bingo();							//빙고 테이블이 채운 가로/세로/대각선 줄 수를 계산하여 반환 
 	
 int main(int argc, char *argv[]) {
@@ -25,7 +27,7 @@ int main(int argc, char *argv[]) {
 	int comchoice[N*N]; 	//컴퓨터가 선택한 숫자를 저장하는 배열 
 	int turn;				//몇번째 turn 에서 승부가 났는지 출력하기 위함 
 	
-	turn = tri+1;
+	 
 	 
 	initiate_bingo(N, user_table, com_table);
 	
@@ -33,11 +35,17 @@ int main(int argc, char *argv[]) {
 	
 	print_bingo(N, user_table, com_table); 
 	
-	for(tri=0; tri<N*N; tri++){
-	
-		get_number_byMe(tri, N, userchoice, comchoice); //***여기서 멈춤 
+	for(tri=0; tri<=N*N/2; tri++){
+		
+		turn = tri + 1;									//tri는 배열요소 였으므로 더하기 1해줘야 turn 
+		printf("\n< %d 번째 turn >\n", turn);			//몇번째 turn인지 출력 
+		
+		get_number_byMe(tri, N, userchoice, comchoice); 
 
-		get_number_byCom(tri, N, userchoice, comchoice); 
+		get_number_byCom(tri, N, userchoice, comchoice);//*****왜 userchoice랑 겹치는지 확인 
+		
+		process_bingo(N, tri, user_table, com_table, userchoice, comchoice);
+		print_bingo(N, user_table, com_table);
 		
 	}
 	
@@ -46,18 +54,6 @@ int main(int argc, char *argv[]) {
 	return 0;
 }
 
-/* void initiate_bingo(int n, int *table1, int *table2)	//*** *table1? table1[n][n]? table1?
-{
-	int i, j;					//특정 횟수만큼 반복하기 위한 변수 
-	int max;					//난수 발생 범위를 위해 변수로 둠  
-	int assigned_value[n*n];	//이미 사용된 값을 변수로 둠  
-	
-	max = n*n;		//빙고 테이블 칸 수  
-	
-	srand((unsigned)time(NULL));
-	
-	//*** pointer 사용? 배열 사용? 
-}*/
 
 void initiate_bingo(int n, int table1[n][n], int table2[n][n])	//***좀 더 간단한거 생각 ****
 {
@@ -151,26 +147,27 @@ void get_number_byMe(int tri, int n, int choice1[n*n], int choice2[n*n])
 	printf("숫자를 선택하시오. : ");
 	scanf("%d", &choice1[tri]);		//tri번째 사용자 선택 
 	
-	do{
-	
-		if(choice1[tri]<1||choice1[tri]>n*n){
+		while(choice1[tri]<1||choice1[tri]>n*n){
 			printf("범위 내의 값이 아닙니다. 1과 %d 사이의 값을 입력하시오. : ", n*n);
 			scanf("%d", &choice1[tri]);	//잘못된 선택이므로 tri번째 선택을 다시 할당시킴 
 		}
-	}while(choice1[tri]<1||choice1[tri]>n*n);
+
 	
-	do{
+
+	
 			
 		for(j=0; j<tri; j++){				//현재 선택보다 이전에의 선택과 비교하기 위함 
-			if(choice1[tri]==choice1[j]||	//사용자가 이미 선택한 수 제외하기 위함 
+		
+			
+			while(choice1[tri]==choice1[j]||	//사용자가 이미 선택한 수 제외하기 위함 
 				choice1[tri]==choice2[j]){	//컴퓨터가 이미 선택한 수 제외하기 위함 
 												
 				printf("이미 선택된 값 입니다. 다시 입력하시오. : ");
-				scanf("%d", &choice1[tri]);	//잘못된 선택이므로 tri번째 선택을 다시 할당  
+				scanf("%d", &choice1[tri]);	//잘못된 선택이므로 tri번째 선택을 다시 할당   
 			}
 		}
-	}while(choice1[tri]==choice1[j]||choice1[tri]==choice2[j]);	//한번 반복 후 여전히 잘못된 선택이
-																	//가능하기 때문에 do-while문 사용 
+		//한번 반복 후 여전히 잘못된 선택이
+															//가능하기 때문에 do-while문 사용 
 	
 }
 
@@ -186,16 +183,52 @@ void get_number_byCom(int tri, int n, int choice1[n*n], int choice2[n*n])
 		srand((unsigned)time(NULL));
 		choice2[tri] = rand()%max+1;		//1부터 n*n+1 사이의 수 랜덤하게 발생 
 		
+	
 		
-		for(j=0; j<tri; j++){				//현재 선택보다 이전에의 선택과 비교하기 위함 
-			if(choice2[tri]==choice1[j]||	//사용자가 이미 선택한 수 제외
-				choice2[tri]==choice2[j]){	//컴퓨터가 이미 선택한 수 제외 
+			for(j=0; j<tri; j++){					//현재 선택보다 이전에의 선택과 비교하기 위함 
+				if(choice2[tri]==choice1[j]||		//사용자가 이미 선택한 수 제외
+					choice2[tri]==choice1[tri]||	//사용자가 같은 tri 일 때 선택한 수 제외
+					choice2[tri]==choice2[j]){		//컴퓨터가 이미 선택한 수 제외 
 				
-				choice2[tri] = rand()%max+1;	//다시 랜덤하게 선택 
+				//*********choice1을 가져오지 못하는거 같음 why.....
 				
+					choice2[tri] = rand()%max+1;	//다시 랜덤하게 선택 
+					j = 0;							//또 겹칠 수 있음을 방지  
+				}
 			}
-		}
 		
-		printf("%d\n", &choice2[tri]);	//잘못된 선택을 삭제하고 tri번째 선택을 재할당
+			printf("%d\n", choice2[tri]);	//출력 
+		
 
+}
+
+void process_bingo(int n, int tri, int table1[n][n], int table2[n][n], 
+					int choice1[tri], int choice2[tri])
+{
+	int i, j;
+	
+	for(i=0; i<n; i++){
+		for(j=0; j<n; j++){
+			if(table1[i][j]==choice1[tri]||
+				table1[i][j]==choice2[tri])	//choice값과 table의 값이 같으면, 
+				
+				table1[i][j] = -1;			//(choice값을 바꾸면 get number by함수에 오류가 생기므로)
+											//table 값을 -1로 바꾸어준다.
+				
+			if (table2[i][j]==choice1[tri]||
+				table2[i][j]==choice2[tri]) //choice값과 table의 값이 같으면, 
+				
+				table2[i][j] = -1;			//(choice값을 바꾸면 get number by함수에 오류가 생기므로)
+											//table 값을 바꾸어준다.
+		}
+	}
+}
+
+
+void count_bingo(int N,)
+{
+	int i, j;
+	
+	
+	
 }
