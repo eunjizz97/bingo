@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#define N 5			//빙고 테이블의 크기 기호 상수 N 
+#define M 4			//이기는 조건 (빙고 개수) M 
 
 int tri;		//get number by ___ 함수들에 공통으로 사용되어야 하므로 전역변수를 쓴다.
  
@@ -15,42 +17,80 @@ void get_number_byCom(int tri, int n, int choice1[n*n], int choice2[n*n]);
 void process_bingo(int n, int tri, int table1[n][n], int table2[n][n], 
 					int choice1[tri], int choice2[tri]);
 											//선택된 숫자를 입력받아서 빙고 테이블 칸을 채움
-void count_bingo();							//빙고 테이블이 채운 가로/세로/대각선 줄 수를 계산하여 반환 
+void count_bingo(int n, int table[n][n], int *count);		//빙고 테이블이 채운 가로/세로/대각선 줄 수를 계산하여 반환 
 	
 int main(int argc, char *argv[]) {
 
-	int N = 4;		//빙고테이블의 크기 조절
-	int M = 3;		//빙고에서 이기는 조건 
+//	int N = 4;		//빙고테이블의 크기 조절
+//	int M = 2;		//빙고에서 이기는 조건 
 	int user_table[N][N];	//사용자의 N*N 크기의 빙고 테이블
 	int com_table[N][N];	//컴퓨터의 N*N 크기의 빙고 테이블 
 	int userchoice[N*N];	//사용자가 선택한 숫자를 저장하는 배열 
 	int comchoice[N*N]; 	//컴퓨터가 선택한 숫자를 저장하는 배열 
 	int turn;				//몇번째 turn 에서 승부가 났는지 출력하기 위함 
+	int usercount;			//사용자의 빙고 개수 
+	int comcount;			//컴퓨터의 빙고 개수 
 	
 	 
 	 
-	initiate_bingo(N, user_table, com_table);
-	
-	//do{
-	
-	print_bingo(N, user_table, com_table); 
-	
-	for(tri=0; tri<=N*N/2; tri++){
-		
-		turn = tri + 1;									//tri는 배열요소 였으므로 더하기 1해줘야 turn 
-		printf("\n< %d 번째 turn >\n", turn);			//몇번째 turn인지 출력 
-		
-		get_number_byMe(tri, N, userchoice, comchoice); 
+	initiate_bingo(N, user_table, com_table);		//빙고판 설정 
 
-		get_number_byCom(tri, N, userchoice, comchoice);//*****왜 userchoice랑 겹치는지 확인 
+
+		print_bingo(N, user_table, com_table); 		//설정된 빙고판을 보여줌 
+	
+	
+		for(tri=0; tri<=N*N/2; tri++){				//모든 칸이 채워지기 전까지 반복 
 		
-		process_bingo(N, tri, user_table, com_table, userchoice, comchoice);
-		print_bingo(N, user_table, com_table);
+			turn = tri + 1;							//tri는 배열요소로 쓰였기 때문에 더하기 1 해줌 
+			printf("\n< %d 번째 turn >\n", turn);	//지금이 몇번째 turn인지 출력 
 		
+		
+			get_number_byMe(tri, N, userchoice, comchoice); //사용자가 숫자 선택 
+			
+			process_bingo(N, tri, user_table, com_table, userchoice, comchoice);//숫자 채움 
+			print_bingo(N, user_table, com_table);		//숫자 채운 빙고판을 다시 출력 
+
+			count_bingo(N, user_table, &usercount);		//사용자의 빙고 몇갠지 셈 
+			printf("user count = %d\n", usercount);		//사용자의 빙고 개수 출력 
+			
+			count_bingo(N, com_table, &comcount);		//컴퓨터의 빙고 몇갠지 셈 
+			printf("com count = %d\n", comcount);		//컴퓨터의 빙고 개수 출력 
+		
+			if((usercount>=M)||(comcount>=M))
+				break;						//usercount가 M보다 크거나 comcount가 M보다 크면 반복중지 
+
+
+
+			get_number_byCom(tri, N, userchoice, comchoice);//*****왜 userchoice랑 겹치는지 확인 
+		
+			process_bingo(N, tri, user_table, com_table, userchoice, comchoice);//숫자 채움 
+			print_bingo(N, user_table, com_table);		//숫자 채운 빙고판을 다시 출력 
+		
+			count_bingo(N, user_table, &usercount);		//사용자의 빙고 몇갠지 셈 
+			printf("user count = %d\n", usercount);		//사용자의 빙고 개수 출력 
+			
+			count_bingo(N, com_table, &comcount);		//컴퓨터의 빙고 몇갠지 셈 
+			printf("com count = %d\n", comcount);		//컴퓨터의 빙고 개수 출력 
+			
+			if((usercount>=M)||(comcount>=M))
+				break;						//usercount가 M보다 크거나 comcount가 M보다 크면 반복중지 
+		}
+	
+
+	if(usercount==comcount){						//먼저 usercount와 comcount를 비교하여 같으면 
+		printf("\n무승부! turn : %d\n", turn);		//무승부와 turn을 출력한다. 
 	}
 	
-	//}while(tri>25||빙고 M줄 완성); 
+	else											//usercount와 comcount가 다른 경우 (일반적인 경우) 
+	{
+		if(usercount>=M){							//usercount가 M보다 크거나 같으면 
+			printf("\n사용자 승리! turn : %d\n", turn);	//사용자 승리와 turn 출력 
+		}
 	
+		if(comcount>=M){							//comcount가 M보다 크거나 같으면 
+			printf("\n컴퓨터 승리! turn : %d\n", turn);	//컴퓨터 승리와 turn 출력 
+		}
+	}
 	return 0;
 }
 
@@ -152,23 +192,17 @@ void get_number_byMe(int tri, int n, int choice1[n*n], int choice2[n*n])
 			scanf("%d", &choice1[tri]);	//잘못된 선택이므로 tri번째 선택을 다시 할당시킴 
 		}
 
-	
-
-	
 			
-		for(j=0; j<tri; j++){				//현재 선택보다 이전에의 선택과 비교하기 위함 
+	for(j=0; j<tri; j++){				//현재 선택보다 이전에의 선택과 비교하기 위함 
 		
 			
-			while(choice1[tri]==choice1[j]||	//사용자가 이미 선택한 수 제외하기 위함 
-				choice1[tri]==choice2[j]){	//컴퓨터가 이미 선택한 수 제외하기 위함 
-												
-				printf("이미 선택된 값 입니다. 다시 입력하시오. : ");
-				scanf("%d", &choice1[tri]);	//잘못된 선택이므로 tri번째 선택을 다시 할당   
-			}
+		while(choice1[tri]==choice1[j]||	//사용자가 이미 선택한 수 제외하기 위함 
+			choice1[tri]==choice2[j]){	//컴퓨터가 이미 선택한 수 제외하기 위함 
+											
+			printf("이미 선택된 값 입니다. 다시 입력하시오. : ");
+			scanf("%d", &choice1[tri]);	//잘못된 선택이므로 tri번째 선택을 다시 할당   
 		}
-		//한번 반복 후 여전히 잘못된 선택이
-															//가능하기 때문에 do-while문 사용 
-	
+	}	
 }
 
 void get_number_byCom(int tri, int n, int choice1[n*n], int choice2[n*n])
@@ -225,10 +259,50 @@ void process_bingo(int n, int tri, int table1[n][n], int table2[n][n],
 }
 
 
-void count_bingo(int N,)
+void count_bingo(int n, int table[n][n], int *count)
 {
-	int i, j;
+	int i, j, k;		//table의 몇번째 배열인지를 다루기 위해 필요한 변수들   
+	int sum=0;			//sum 값을 0으로 초기화  
 	
+	*count=0;			//count 값을 0으로 초기화 
 	
+	//가로줄 빙고 개수 세는 코드 
+	for(i=0; i<n; i++){				//행 하나씩 증가시키며 반복 
+		for(j=0; j<n; j++){			//행을 고정시킨 후 열을 하나씩 증가시키면서 
+			sum += table[i][j];		//i행의 열들의 합을 구함 
+			if(sum == -n){			//그 합이 -n 이면 
+				(*count)++;			//빙고의 개수를 하나 증가 시킴 
+			}
+		}
+		sum = 0;					//행이 바뀌기 전에, sum 을 다시 0으로 초기화 시킴 
+	}
 	
+	//세로줄 빙고 개수 세는 코드 
+	for(j=0; j<n; j++){				//열 하나씩 증가시키며 반복 
+		for(i=0; i<n; i++){			//행을 고정시킨 후 행을 하나씩 증가시키면서 
+			sum += table[i][j];		//j열의 행들의 합을 구함 
+			if(sum == -n){			//그 합이 -n 이면 
+				(*count)++;			//빙고의 개수를 하나 증가 시킴 
+			}
+		}
+		sum = 0;					//열이 바뀌기 전에, sum을 다시 0으로 초기화 
+	}
+	
+	//대각선 빙고 개수 세는 코드 
+	for(i=0; i<n; i++){				//i를 하나씩 증가시키면서 
+		sum += table[i][i];			//대각선의 총 합을 구함 
+		if(sum == -n){				//그 합이 -n 이면 
+			(*count)++;				//빙고의 개수를 하나 증가 시킴 
+		}
+	}
+	
+	//반대방향 대각선 빙고 개수 세는 코드 *******왜 안되는지 
+	for(i=0; i<n; i++){				//i를 하나씩 증가시키면서 
+		k = n-1-i;					//k값은 줄어들도록 k값 설정 
+		sum += table[i][k];			//대각선의 총 합을 구함 
+		if(sum == -n){				//그 합이 -n이면 
+			(*count)++;				//빙고의 개수를 하나 증가 시킴 
+		}
+	} 
+
 }
