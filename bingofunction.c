@@ -76,20 +76,12 @@ void print_bingo(int n, int table1[n][n])
 	}
 	printf("\n");
 	
-/*	printf("< 컴퓨터 빙고 테이블 >\n");
-	for(i=0; i<n; i++){
-		for(j=0; j<n; j++){
-			printf("%d\t", table2[i][j]);	//빙고 테이블을 출력하는 코드 
-		}	printf("\n");					//행을 바꾸어 출력하는 코드 
-	}
-	printf("\n");
-*/	
+
 }
 
 void get_number_byMe(int tri, int n, int choice[n*n])
 {
-	int j;
-	
+	int j;						//이전의 선택을 배열로 받기 위한 변수 
 	
 	printf("1과 %d 사이의 숫자를 선택하시오. : ", n*n);	//숫자 선택하라고 출력 
 	scanf("%d", &choice[tri]);							//tri번째 (사용자가) 선택 
@@ -113,8 +105,8 @@ void get_number_byMe(int tri, int n, int choice[n*n])
 
 void get_number_byCom(int tri, int n, int choice[n*n])
 {
-	int j;
-	int max;
+	int j;						//이전의 선택을 배열로 받기 위한 변수 
+	int max;					//난수 발생 범위를 max 로 놓음  
 	max = n*n; 
 
 	
@@ -140,7 +132,7 @@ void get_number_byCom(int tri, int n, int choice[n*n])
 void process_bingo(int n, int tri, int table1[n][n], int table2[n][n], 
 					int choice[tri])
 {
-	int i, j;
+	int i, j;								//각 배열 요소 & 반복을 위한 변수 
 	
 	for(i=0; i<n; i++){
 		for(j=0; j<n; j++){

@@ -37,7 +37,8 @@ int main(int argc, char *argv[]) {
 	printf("< 게임방법 >\n");
 	printf("사용자와 컴퓨터가 돌아가며 %d칸 짜리 빙고판에 숫자를 채운다.\n", N*N);
 	printf("채워진 숫자는 -1로 바뀐다.\n");
-	printf("count가 먼저 %d가  되는 사람이 승리!\n\n", M);
+	printf("count가 먼저 %d가  되는 사람이 승리!\n", M);
+	printf("단, 사용자와 컴퓨터 동시에 빙고 count가 %d줄 이상이 되면 무승부로 한다.\n\n", M);
 	 
 	initiate_bingo(N, user_table, com_table);		//빙고판 설정 
 
