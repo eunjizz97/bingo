@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
 				
 		//<반복을 끝내는 조건을 나타내는 코드>	
 		if((usercount>=M)||(comcount>=M))
-			break;						//usercount가 M보다 크거나 comcount가 M보다 크면 반복중지 
+			break;						//usercount가 M보다 크거나 같으면 혹은, comcount가 M보다 크거나 같으면 반복중지 
 
 	}
 	
